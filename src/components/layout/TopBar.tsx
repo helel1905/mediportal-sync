@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Menu, Bell, Search, User } from "lucide-react";
+import { Menu, Bell, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,9 +16,11 @@ import { cn } from "@/lib/utils";
 interface TopBarProps {
   toggleSidebar: () => void;
   userRole: string;
+  userName: string;
+  onLogout: () => void;
 }
 
-export const TopBar = ({ toggleSidebar, userRole }: TopBarProps) => {
+export const TopBar = ({ toggleSidebar, userRole, userName, onLogout }: TopBarProps) => {
   const getRoleLabel = (): string => {
     switch (userRole) {
       case "doctor":
@@ -96,7 +98,7 @@ export const TopBar = ({ toggleSidebar, userRole }: TopBarProps) => {
                   <User className="h-5 w-5 text-primary" />
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">张医生</p>
+                  <p className="text-sm font-medium">{userName}</p>
                   <p className="text-xs text-gray-500">{getRoleLabel()}</p>
                 </div>
               </Button>
@@ -107,7 +109,10 @@ export const TopBar = ({ toggleSidebar, userRole }: TopBarProps) => {
               <DropdownMenuItem>个人资料</DropdownMenuItem>
               <DropdownMenuItem>设置</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>退出登录</DropdownMenuItem>
+              <DropdownMenuItem onClick={onLogout} className="text-red-500">
+                <LogOut className="mr-2 h-4 w-4" />
+                退出登录
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

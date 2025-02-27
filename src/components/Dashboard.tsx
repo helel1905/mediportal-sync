@@ -4,14 +4,17 @@ import DoctorDashboard from "./dashboard/DoctorDashboard";
 import PharmacyDashboard from "./dashboard/PharmacyDashboard";
 import FinanceDashboard from "./dashboard/FinanceDashboard";
 import AdminDashboard from "./dashboard/AdminDashboard";
+import { useAuth } from "@/contexts/AuthContext";
 
-interface DashboardProps {
-  userRole: string;
-}
-
-const Dashboard = ({ userRole }: DashboardProps) => {
+const Dashboard = () => {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return null;
+  }
+  
   // Render dashboard based on user role
-  switch (userRole) {
+  switch (user.role) {
     case "doctor":
       return <DoctorDashboard />;
     case "pharmacy":

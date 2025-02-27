@@ -17,16 +17,14 @@ import {
   Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
   currentRole: string;
-  onRoleChange: (role: string) => void;
 }
 
-export const Sidebar = ({ isOpen, currentRole, onRoleChange }: SidebarProps) => {
+export const Sidebar = ({ isOpen, currentRole }: SidebarProps) => {
   // Menu items based on user role
   const menuItems = {
     doctor: [
@@ -106,26 +104,6 @@ export const Sidebar = ({ isOpen, currentRole, onRoleChange }: SidebarProps) => 
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Role selector (for demo) */}
-            <div className="px-4 mb-6">
-              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                角色切换 (演示)
-              </h2>
-              <div className="space-y-1">
-                {roleOptions.map((role) => (
-                  <Button
-                    key={role.id}
-                    variant={currentRole === role.id ? "default" : "outline"}
-                    size="sm"
-                    className="w-full justify-start"
-                    onClick={() => onRoleChange(role.id)}
-                  >
-                    {role.name}
-                  </Button>
-                ))}
-              </div>
             </div>
           </nav>
         </>

@@ -1,8 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -10,35 +11,20 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [currentUserRole, setCurrentUserRole] = useState<string>("doctor");
   const { toast } = useToast();
+  const { user, logout } = useAuth();
 
-  // Simulate authentication state - in a real app, this would be replaced with actual auth
-  useEffect(() => {
-    // For demonstration, show a welcome toast
-    toast({
-      title: "欢迎回来",
-      description: "您已成功登录到医院管理系统",
-      duration: 3000,
-    });
-  }, [toast]);
+  // 确保有用户登录
+  if (!user) {
+    return null;
+  }
 
   // Toggle sidebar visibility
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // This would be part of an auth system in a real application
-  const handleRoleChange = (role: string) => {
-    setCurrentUserRole(role);
-    toast({
-      title: "角色已切换",
-      description: `您现在以${getRoleName(role)}身份登录`,
-      duration: 3000,
-    });
-  };
-
-  // Helper function to get role name in Chinese
+  // 获取角色名称
   const getRoleName = (role: string): string => {
     switch (role) {
       case "doctor":
@@ -59,13 +45,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Sidebar */}
       <Sidebar 
         isOpen={sidebarOpen} 
-        currentRole={currentUserRole} 
-        onRoleChange={handleRoleChange}
+        currentRole={user.role}
       />
 
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar toggleSidebar={toggleSidebar} userRole={currentUserRole} />
+        <TopBar 
+          toggleSidebar={toggleSidebar} 
+          userRole={user.role} 
+          userName={user.name}
+          onLogout={logout}
+        />
         
         {/* Main content area with scroll */}
         <main className="flex-1 overflow-y-auto p-6">
