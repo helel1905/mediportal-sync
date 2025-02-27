@@ -10,7 +10,7 @@ import {
   Server, 
   HardDrive,
   Cpu,
-  Memory,
+  BarChart3,
   Shield,
   ArrowRight,
   Clock,
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
         <Card className="dashboard-card animate-scale-in" style={{ animationDelay: "0.1s" }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">内存使用</CardTitle>
-            <Memory className="h-4 w-4 text-yellow-500" />
+            <BarChart3 className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">55%</div>
