@@ -52,8 +52,8 @@ import {
   Eye,
   Edit,
   ChevronDown,
-  Male,
-  Female,
+  UserCircle,
+  UserCircle2,
   Users,
   Bell,
 } from "lucide-react";
@@ -456,9 +456,9 @@ const PatientRecords = () => {
                                   onClick={() => handleViewGeneticReport(patient)}
                                 >
                                   {patient.gender === "male" ? (
-                                    <Male className="h-5 w-5 text-blue-500" />
+                                    <UserCircle className="h-5 w-5 text-blue-500" />
                                   ) : patient.gender === "female" ? (
-                                    <Female className="h-5 w-5 text-pink-500" />
+                                    <UserCircle2 className="h-5 w-5 text-pink-500" />
                                   ) : (
                                     <Users className="h-5 w-5 text-purple-500" />
                                   )}
@@ -679,9 +679,9 @@ const PatientRecords = () => {
                 <div className="border p-4 bg-gray-50 w-full h-48 flex flex-col items-center justify-center">
                   <div className="text-gray-500 mb-4">
                     {currentPatient?.gender === "male" ? (
-                      <Male className="h-12 w-12 text-blue-500" />
+                      <UserCircle className="h-12 w-12 text-blue-500" />
                     ) : currentPatient?.gender === "female" ? (
-                      <Female className="h-12 w-12 text-pink-500" />
+                      <UserCircle2 className="h-12 w-12 text-pink-500" />
                     ) : (
                       <Users className="h-12 w-12 text-purple-500" />
                     )}
