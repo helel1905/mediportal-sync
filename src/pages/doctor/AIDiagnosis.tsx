@@ -6,6 +6,7 @@ import {
   Plus,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Send,
   Paperclip,
   Clock,
