@@ -1,5 +1,4 @@
-
-import { Medicine, Prescription } from "@/types/pharmacy";
+import { Medicine, Prescription, ExpiryAlert, ExpiryStatus } from "@/types/pharmacy";
 
 // Mock prescription data
 const mockPrescriptions: Prescription[] = [
@@ -364,6 +363,108 @@ const mockInventory: InventoryItem[] = [
   }
 ];
 
+// Mock expiry alerts data
+const mockExpiryAlerts: ExpiryAlert[] = [
+  {
+    id: "EA001",
+    medicineId: "M008",
+    medicineName: "丁酸氢化可的松乳膏",
+    specification: "20g:0.1g",
+    manufacturer: "重庆华邦制药",
+    batchNumber: "20230815-A",
+    expiryDate: "2024-08-12",
+    currentStock: 15,
+    unit: "支",
+    status: "approaching",
+    daysRemaining: 30,
+    location: "药房-A区-12柜"
+  },
+  {
+    id: "EA002",
+    medicineId: "M011",
+    medicineName: "辛伐他汀片",
+    specification: "10mg*7片",
+    manufacturer: "默沙东",
+    batchNumber: "20220530-B",
+    expiryDate: "2024-05-30",
+    currentStock: 8,
+    unit: "片",
+    status: "approaching",
+    daysRemaining: 15,
+    location: "药房-B区-03柜"
+  },
+  {
+    id: "EA003",
+    medicineId: "M013",
+    medicineName: "阿莫西林胶囊",
+    specification: "0.25g*10粒",
+    manufacturer: "哈药集团",
+    batchNumber: "20230123-C",
+    expiryDate: "2024-06-20",
+    currentStock: 105,
+    unit: "粒",
+    status: "approaching",
+    daysRemaining: 22,
+    location: "药房-A区-05柜"
+  },
+  {
+    id: "EA004",
+    medicineId: "M014",
+    medicineName: "复方甘草片",
+    specification: "0.5g*24片",
+    manufacturer: "北京同仁堂",
+    batchNumber: "20220815-D",
+    expiryDate: "2023-12-31",
+    currentStock: 87,
+    unit: "片",
+    status: "expired",
+    daysRemaining: -50,
+    location: "药房-C区-08柜"
+  },
+  {
+    id: "EA005",
+    medicineId: "M007",
+    medicineName: "氯雷他定片",
+    specification: "10mg*6片",
+    manufacturer: "扬子江药业",
+    batchNumber: "20230405-B",
+    expiryDate: "2024-09-05",
+    currentStock: 72,
+    unit: "片",
+    status: "approaching",
+    daysRemaining: 60,
+    location: "药房-B区-06柜"
+  },
+  {
+    id: "EA006",
+    medicineId: "M006",
+    medicineName: "阿司匹林肠溶片",
+    specification: "100mg*30片",
+    manufacturer: "拜耳医药",
+    batchNumber: "20230718-A",
+    expiryDate: "2025-07-18",
+    currentStock: 30,
+    unit: "片",
+    status: "normal",
+    daysRemaining: 365,
+    location: "药房-A区-09柜"
+  },
+  {
+    id: "EA007",
+    medicineId: "M002",
+    medicineName: "二甲双胍片",
+    specification: "0.5g*10片",
+    manufacturer: "江苏恒瑞医药",
+    batchNumber: "20230915-C",
+    expiryDate: "2025-09-15",
+    currentStock: 200,
+    unit: "片",
+    status: "normal",
+    daysRemaining: 400,
+    location: "药房-B区-01柜"
+  }
+];
+
 // Get all prescriptions with optional filter
 export const getMockPrescriptions = () => {
   return mockPrescriptions;
@@ -409,6 +510,32 @@ export const updateInventoryStock = (id: string, newStock: number) => {
     };
     
     return mockInventory[index];
+  }
+  
+  return null;
+};
+
+// Get all expiry alerts with optional filter
+export const getMockExpiryAlerts = () => {
+  return mockExpiryAlerts;
+};
+
+// Get a specific expiry alert by ID
+export const getMockExpiryAlertById = (id: string) => {
+  return mockExpiryAlerts.find(alert => alert.id === id) || null;
+};
+
+// Update expiry alert status
+export const updateExpiryAlertStatus = (id: string, status: ExpiryStatus) => {
+  const index = mockExpiryAlerts.findIndex(alert => alert.id === id);
+  
+  if (index !== -1) {
+    mockExpiryAlerts[index] = {
+      ...mockExpiryAlerts[index],
+      status
+    };
+    
+    return mockExpiryAlerts[index];
   }
   
   return null;

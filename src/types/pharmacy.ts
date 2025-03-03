@@ -1,5 +1,6 @@
 
 export type PrescriptionStatus = "pending" | "approved" | "rejected";
+export type ExpiryStatus = "normal" | "approaching" | "expired";
 
 export interface Medicine {
   id: string;
@@ -12,6 +13,8 @@ export interface Medicine {
   unit: string;
   inStock: boolean;
   stock: number;
+  expiryDate?: string;
+  expiryStatus?: ExpiryStatus;
 }
 
 export interface Prescription {
@@ -30,4 +33,19 @@ export interface Prescription {
   reviewedBy?: string;
   reviewNote?: string;
   isUrgent: boolean;
+}
+
+export interface ExpiryAlert {
+  id: string;
+  medicineId: string;
+  medicineName: string;
+  specification: string;
+  manufacturer: string;
+  batchNumber: string;
+  expiryDate: string;
+  currentStock: number;
+  unit: string;
+  status: ExpiryStatus;
+  daysRemaining: number;
+  location: string;
 }
