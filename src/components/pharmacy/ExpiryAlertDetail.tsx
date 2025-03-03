@@ -32,6 +32,7 @@ import {
 import { toast } from "sonner";
 import { getMockExpiryAlertById } from "@/lib/mockData";
 import { ExpiryAlert, ExpiryStatus } from "@/types/pharmacy";
+import { cn } from "@/lib/utils";
 
 interface ExpiryAlertDetailProps {
   alertId: string;
