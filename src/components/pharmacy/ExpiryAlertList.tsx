@@ -9,30 +9,48 @@ import {
   AlertTriangle, 
   Clock, 
   CheckCircle,
-  Package
+  Package,
+  Calendar,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ExpiryStatus, ExpiryAlert } from "@/types/pharmacy";
 import { getMockExpiryAlerts } from "@/lib/mockData";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { Button } from "@/components/ui/button";
 
 interface ExpiryAlertListProps {
   filter: ExpiryStatus | "all";
   onSelectAlert: (id: string) => void;
   selectedAlertId: string | null;
+  selectedDate?: Date | null;
+  onClearDateFilter?: () => void;
 }
 
 const ExpiryAlertList = ({ 
   filter, 
   onSelectAlert,
-  selectedAlertId
+  selectedAlertId,
+  selectedDate,
+  onClearDateFilter
 }: ExpiryAlertListProps) => {
   // Using mock data
   const allAlerts = getMockExpiryAlerts();
   
-  // Filter alerts based on the selected tab
-  const alerts = filter === "all" 
+  // First filter alerts based on the selected tab
+  let filteredAlerts = filter === "all" 
     ? allAlerts 
     : allAlerts.filter(a => a.status === filter);
+  
+  // Then apply date filter if a date is selected
+  if (selectedDate) {
+    const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+    filteredAlerts = filteredAlerts.filter(alert => {
+      const alertDate = alert.expiryDate.substring(0, 10); // Get YYYY-MM-DD part
+      return alertDate === selectedDateStr;
+    });
+  }
 
   // Helper function to get appropriate icon and color for alert status
   const getStatusDetails = (status: ExpiryStatus) => {
@@ -78,16 +96,37 @@ const ExpiryAlertList = ({
     <Card>
       <CardContent className="p-4">
         <div className="space-y-2">
+          {selectedDate && (
+            <div className="flex items-center justify-between mb-4 bg-muted/50 p-2 rounded-md">
+              <div className="flex items-center text-sm">
+                <Calendar className="h-4 w-4 mr-2 text-primary" />
+                <span>
+                  筛选日期: {format(selectedDate, 'yyyy年MM月dd日', { locale: zhCN })}
+                </span>
+              </div>
+              {onClearDateFilter && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-7 w-7 p-0" 
+                  onClick={onClearDateFilter}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          )}
+          
           <div className="text-sm font-medium text-muted-foreground mb-4">
-            {alerts.length === 0 ? (
+            {filteredAlerts.length === 0 ? (
               <p className="text-center py-8">暂无数据</p>
             ) : (
-              `共 ${alerts.length} 条记录`
+              `共 ${filteredAlerts.length} 条记录`
             )}
           </div>
           
           <div className="space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto pr-2">
-            {alerts.map((alert) => {
+            {filteredAlerts.map((alert) => {
               const statusDetails = getStatusDetails(alert.status);
               
               return (

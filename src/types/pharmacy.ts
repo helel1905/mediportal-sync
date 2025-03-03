@@ -1,4 +1,3 @@
-
 export type PrescriptionStatus = "pending" | "approved" | "rejected";
 export type ExpiryStatus = "normal" | "approaching" | "expired";
 
@@ -48,4 +47,11 @@ export interface ExpiryAlert {
   status: ExpiryStatus;
   daysRemaining: number;
   location: string;
+}
+
+export interface ExpiryDateInfo {
+  date: string;
+  count: number;
+  hasExpired: boolean;
+  hasApproaching: boolean;
 }
