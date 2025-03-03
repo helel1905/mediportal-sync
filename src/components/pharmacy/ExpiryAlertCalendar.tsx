@@ -86,7 +86,7 @@ const ExpiryAlertCalendar = ({ onDateSelect }: ExpiryAlertCalendarProps) => {
               locale={zhCN}
               className="rounded-md"
               components={{
-                Day: ({ day, ...props }) => (
+                Day: ({ date, ...props }) => (
                   <button
                     {...props}
                     className={cn(
@@ -94,7 +94,7 @@ const ExpiryAlertCalendar = ({ onDateSelect }: ExpiryAlertCalendarProps) => {
                       "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
                     )}
                   >
-                    {renderDay(day)}
+                    {renderDay(date)}
                   </button>
                 ),
               }}
