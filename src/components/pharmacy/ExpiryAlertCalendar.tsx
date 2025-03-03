@@ -8,6 +8,7 @@ import { zhCN } from "date-fns/locale";
 import { ExpiryAlert } from "@/types/pharmacy";
 import { getMockExpiryAlerts } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
+import { DayContent, DayContentProps } from "react-day-picker";
 
 interface ExpiryAlertCalendarProps {
   onDateSelect: (date: Date | null) => void;
@@ -69,6 +70,16 @@ const ExpiryAlertCalendar = ({ onDateSelect }: ExpiryAlertCalendarProps) => {
     );
   };
 
+  // Custom day component to render our custom day content
+  const CustomDay = (props: DayContentProps) => {
+    const { date, ...rest } = props;
+    return (
+      <div className="h-9 w-9 p-0 font-normal aria-selected:opacity-100">
+        {renderDay(date)}
+      </div>
+    );
+  };
+
   return (
     <Card className="border">
       <CardContent className="p-4">
@@ -86,17 +97,7 @@ const ExpiryAlertCalendar = ({ onDateSelect }: ExpiryAlertCalendarProps) => {
               locale={zhCN}
               className="rounded-md"
               components={{
-                Day: ({ date, ...props }) => (
-                  <button
-                    {...props}
-                    className={cn(
-                      props.className,
-                      "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-                    )}
-                  >
-                    {renderDay(date)}
-                  </button>
-                ),
+                DayContent: CustomDay
               }}
             />
           </div>
