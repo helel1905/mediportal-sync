@@ -86,7 +86,7 @@ const ExpiryAlertCalendar = ({ onDateSelect }: ExpiryAlertCalendarProps) => {
               locale={zhCN}
               className="rounded-md"
               components={{
-                Day: ({ date: day, ...props }) => (
+                Day: ({ day, ...props }) => (
                   <button
                     {...props}
                     className={cn(
