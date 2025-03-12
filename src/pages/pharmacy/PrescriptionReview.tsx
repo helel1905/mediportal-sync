@@ -40,14 +40,14 @@ const PrescriptionReview = () => {
         </div>
 
         <Tabs defaultValue="pending" onValueChange={handleTabChange}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="all">全部</TabsTrigger>
             <TabsTrigger value="pending">待审核</TabsTrigger>
             <TabsTrigger value="approved">已批准</TabsTrigger>
             <TabsTrigger value="rejected">已拒绝</TabsTrigger>
           </TabsList>
           
-          <div className="flex gap-6 mt-6">
+          <div className="flex gap-6">
             <div className="w-2/5">
               <TabsContent value="all" className="m-0">
                 <PrescriptionList 
