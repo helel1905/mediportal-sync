@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -181,6 +180,235 @@ const mockPatients = [
     doctor: "孙医生",
     doctorTitle: "副主任医师",
     isMultipleDoctor: true,
+    isSenior: true,
+    hasPrescription: true,
+  },
+  // 张医生的15个新增患者（均匀分布在不同状态）
+  // 5个候诊患者
+  {
+    id: "P20230009",
+    name: "张志远",
+    gender: "male",
+    age: 45,
+    birthDate: "1978-03-24",
+    status: "waiting",
+    registerTime: new Date(Date.now() - 12 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230010",
+    name: "林小燕",
+    gender: "female",
+    age: 29,
+    birthDate: "1994-07-18",
+    status: "waiting",
+    registerTime: new Date(Date.now() - 18 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230011",
+    name: "陈大力",
+    gender: "male",
+    age: 57,
+    birthDate: "1966-11-05",
+    status: "waiting",
+    registerTime: new Date(Date.now() - 25 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: true,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230012",
+    name: "王丽丽",
+    gender: "female",
+    age: 33,
+    birthDate: "1990-09-12",
+    status: "waiting",
+    registerTime: new Date(Date.now() - 8 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230013",
+    name: "李强强",
+    gender: "male",
+    age: 41,
+    birthDate: "1982-05-28",
+    status: "waiting",
+    registerTime: new Date(Date.now() - 32 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  // 5个诊中患者
+  {
+    id: "P20230014",
+    name: "徐婷婷",
+    gender: "female",
+    age: 26,
+    birthDate: "1997-02-14",
+    status: "in-treatment",
+    registerTime: new Date(Date.now() - 55 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230015",
+    name: "赵明明",
+    gender: "male",
+    age: 38,
+    birthDate: "1985-08-22",
+    status: "in-treatment",
+    registerTime: new Date(Date.now() - 65 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: true,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230016",
+    name: "周倩倩",
+    gender: "female",
+    age: 31,
+    birthDate: "1992-04-10",
+    status: "in-treatment",
+    registerTime: new Date(Date.now() - 75 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230017",
+    name: "刘建国",
+    gender: "male",
+    age: 67,
+    birthDate: "1956-10-01",
+    status: "in-treatment",
+    registerTime: new Date(Date.now() - 85 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: true,
+    hasPrescription: false,
+  },
+  {
+    id: "P20230018",
+    name: "张丽娟",
+    gender: "female",
+    age: 45,
+    birthDate: "1978-12-05",
+    status: "in-treatment",
+    registerTime: new Date(Date.now() - 95 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: false,
+  },
+  // 5个完成患者
+  {
+    id: "P20230019",
+    name: "王志强",
+    gender: "male",
+    age: 52,
+    birthDate: "1971-06-30",
+    status: "completed",
+    registerTime: new Date(Date.now() - 150 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: true,
+    hasPrescription: true,
+  },
+  {
+    id: "P20230020",
+    name: "李晓晓",
+    gender: "female",
+    age: 29,
+    birthDate: "1994-11-22",
+    status: "completed",
+    registerTime: new Date(Date.now() - 165 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: true,
+  },
+  {
+    id: "P20230021",
+    name: "钱小宝",
+    gender: "male",
+    age: 6,
+    birthDate: "2017-08-14",
+    status: "completed",
+    registerTime: new Date(Date.now() - 180 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: true,
+  },
+  {
+    id: "P20230022",
+    name: "郑美丽",
+    gender: "female",
+    age: 34,
+    birthDate: "1989-03-25",
+    status: "completed",
+    registerTime: new Date(Date.now() - 195 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
+    isSenior: false,
+    hasPrescription: true,
+  },
+  {
+    id: "P20230023",
+    name: "黄大山",
+    gender: "male",
+    age: 61,
+    birthDate: "1962-12-08",
+    status: "completed",
+    registerTime: new Date(Date.now() - 210 * 60 * 1000),
+    department: "内科/消化内科",
+    doctor: "张医生",
+    doctorTitle: "主任医师",
+    isMultipleDoctor: false,
     isSenior: true,
     hasPrescription: true,
   },
@@ -562,625 +790,4 @@ const PatientRecords = () => {
 
                             {/* 年龄 */}
                             <TableCell>
-                              <div className="flex items-center gap-1">
-                                {patient.age}岁
-                                {patient.isSenior && (
-                                  <span className="text-yellow-500 text-lg">⚠</span>
-                                )}
-                                <span className="text-xs text-muted-foreground">
-                                  ({patient.birthDate})
-                                </span>
-                              </div>
-                            </TableCell>
-
-                            {/* 性别 */}
-                            <TableCell>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => handleViewGeneticReport(patient)}
-                                    >
-                                      {patient.gender === "male" ? (
-                                        <UserCircle className="h-5 w-5 text-blue-500" />
-                                      ) : patient.gender === "female" ? (
-                                        <UserCircle2 className="h-5 w-5 text-pink-500" />
-                                      ) : (
-                                        <Users className="h-5 w-5 text-purple-500" />
-                                      )}
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>查看基因报告</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </TableCell>
-
-                            {/* 就诊状态 */}
-                            <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className={`px-2 py-1 h-auto ${
-                                      patient.status === "waiting"
-                                        ? "text-blue-700 bg-blue-50 hover:bg-blue-100"
-                                        : patient.status === "in-treatment"
-                                        ? "text-yellow-700 bg-yellow-50 hover:bg-yellow-100"
-                                        : "text-green-700 bg-green-50 hover:bg-green-100"
-                                    }`}
-                                  >
-                                    {patient.status === "waiting"
-                                      ? "候诊"
-                                      : patient.status === "in-treatment"
-                                      ? "诊中"
-                                      : "完成"}
-                                    <ChevronDown className="ml-1 h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="center">
-                                  <DropdownMenuItem 
-                                    onClick={() => handleStatusChange(patient.id, "waiting")}
-                                    className="text-blue-600"
-                                  >
-                                    候诊
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleStatusChange(patient.id, "in-treatment")}
-                                    className="text-yellow-600"
-                                  >
-                                    诊中
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleStatusChange(patient.id, "completed")}
-                                    className="text-green-600"
-                                  >
-                                    完成
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-
-                            {/* 挂号时间 */}
-                            <TableCell>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span className={isOverdue(patient.registerTime, patient.status) ? "text-red-500" : ""}>
-                                  {formatRelativeTime(patient.registerTime)}
-                                </span>
-                              </div>
-                            </TableCell>
-
-                            {/* 科室 */}
-                            <TableCell>
-                              <Button
-                                variant="link"
-                                className="p-0 h-auto font-normal"
-                                onClick={() => handleGotoDepartmentQueue(patient.department)}
-                              >
-                                {patient.department}
-                              </Button>
-                            </TableCell>
-
-                            {/* 主治医生 */}
-                            <TableCell>
-                              <div className="flex items-center gap-1">
-                                <div className="bg-primary/10 w-6 h-6 rounded-full flex items-center justify-center text-xs text-primary font-medium">
-                                  {patient.doctor.charAt(0)}
-                                </div>
-                                <span>
-                                  {patient.doctor}
-                                  <span className="text-xs text-muted-foreground ml-1">
-                                    ({patient.doctorTitle})
-                                  </span>
-                                </span>
-                                {patient.isMultipleDoctor && (
-                                  <Badge variant="outline" className="ml-1 h-5 px-1">
-                                    多医生
-                                  </Badge>
-                                )}
-                              </div>
-                            </TableCell>
-
-                            {/* 操作 */}
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Eye className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>查看病历</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>编辑病历</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                {patient.hasPrescription ? (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          className="h-8 w-8 p-0 text-primary"
-                                          onClick={() => handleViewPrescription(patient)}
-                                        >
-                                          <FileDown className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>查看处方</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                ) : (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          className="h-8 w-8 p-0 text-blue-500"
-                                          onClick={() => handleCreatePrescription(patient)}
-                                        >
-                                          <FilePlus className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>开具处方</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* 处方管理选项卡 */}
-          <TabsContent value="prescriptions" className="mt-6">
-            {/* 筛选和搜索区域 */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      placeholder="搜索患者姓名或ID..."
-                      className="pl-10"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-
-                  <Select
-                    value={departmentFilter}
-                    onValueChange={setDepartmentFilter}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择科室" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">所有科室</SelectItem>
-                      <SelectItem value="内科">内科</SelectItem>
-                      <SelectItem value="外科">外科</SelectItem>
-                      <SelectItem value="妇产科">妇产科</SelectItem>
-                      <SelectItem value="儿科">儿科</SelectItem>
-                      <SelectItem value="精神科">精神科</SelectItem>
-                      <SelectItem value="耳鼻喉科">耳鼻喉科</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
-                    <SelectTrigger className="flex items-center">
-                      <Stethoscope className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <SelectValue placeholder="选择医生" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">所有医生</SelectItem>
-                      {mockDoctors.map((doctor) => (
-                        <SelectItem key={doctor.name} value={doctor.name}>
-                          {doctor.name} ({doctor.title})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select 
-                    value={prescriptionFilter} 
-                    onValueChange={(value) => setPrescriptionFilter(value as "all" | "withPrescription" | "withoutPrescription")}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="处方状态" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">所有患者</SelectItem>
-                      <SelectItem value="withPrescription">有处方</SelectItem>
-                      <SelectItem value="withoutPrescription">无处方</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={handleResetFilters}
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    重置筛选
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 患者处方表格 */}
-            <Card className="mt-6">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>患者ID</TableHead>
-                        <TableHead>姓名</TableHead>
-                        <TableHead>年龄/性别</TableHead>
-                        <TableHead>科室</TableHead>
-                        <TableHead>主治医生</TableHead>
-                        <TableHead>处方状态</TableHead>
-                        <TableHead className="text-right">操作</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredPatients.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                            未找到符合条件的患者
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredPatients.map((patient) => (
-                          <TableRow key={patient.id}>
-                            <TableCell>{patient.id}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="link"
-                                className="p-0 h-auto font-normal"
-                                onClick={() => handleViewIdCard(patient)}
-                              >
-                                {patient.name}
-                              </Button>
-                            </TableCell>
-                            <TableCell>
-                              {patient.age}岁 / {patient.gender === "male" ? "男" : patient.gender === "female" ? "女" : "其他"}
-                            </TableCell>
-                            <TableCell>{patient.department}</TableCell>
-                            <TableCell>{patient.doctor}</TableCell>
-                            <TableCell>
-                              {patient.hasPrescription ? (
-                                <Badge variant="secondary" className="bg-green-50 text-green-700">
-                                  已开具
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-gray-50 text-gray-500">
-                                  未开具
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {patient.hasPrescription ? (
-                                  <>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="h-8"
-                                      onClick={() => handleViewPrescription(patient)}
-                                    >
-                                      查看处方
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="h-8"
-                                    >
-                                      修改
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <Button 
-                                    variant="default" 
-                                    size="sm" 
-                                    className="h-8"
-                                    onClick={() => handleCreatePrescription(patient)}
-                                  >
-                                    开具处方
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* 医保信息弹窗 */}
-      <Dialog open={showingMedicalInsurance} onOpenChange={setShowingMedicalInsurance}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>医保信息</DialogTitle>
-            <DialogDescription>
-              患者 {currentPatient?.name} 的医保详情
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex justify-center pb-4">
-              <div className="border p-4 bg-gray-50 w-48 h-32 flex items-center justify-center">
-                <Barcode className="h-16 w-16 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">医保卡号:</span>
-                <span className="text-sm">MI{currentPatient?.id.substring(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">医保类型:</span>
-                <span className="text-sm">城镇职工医保</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">参保年限:</span>
-                <span className="text-sm">8年</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">报销比例:</span>
-                <span className="text-sm">75%</span>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowingMedicalInsurance(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 身份证照片弹窗 */}
-      <Dialog open={idCardPreview} onOpenChange={setIdCardPreview}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>身份证照片</DialogTitle>
-            <DialogDescription>
-              {currentPatient?.name} 的身份证照片核对
-            </DialogDescription>.
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex justify-center pb-4">
-              <div className="border p-4 bg-gray-50 w-64 h-40 flex items-center justify-center">
-                <User className="h-24 w-24 text-gray-300" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">姓名:</span>
-                <span className="text-sm">{currentPatient?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">身份证号:</span>
-                <span className="text-sm">3****************X</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">出生日期:</span>
-                <span className="text-sm">{currentPatient?.birthDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">住址:</span>
-                <span className="text-sm">上海市浦东新区</span>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setIdCardPreview(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 基因报告弹窗 */}
-      <Dialog open={geneticReport} onOpenChange={setGeneticReport}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>染色体检测报告</DialogTitle>
-            <DialogDescription>
-              {currentPatient?.name} 的基因检测结果
-            </DialogDescription>
-          </DialogHeader>
-          <Tabs defaultValue="summary">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="summary">报告摘要</TabsTrigger>
-              <TabsTrigger value="details">详细结果</TabsTrigger>
-              <TabsTrigger value="history">检测历史</TabsTrigger>
-            </TabsList>
-            <TabsContent value="summary" className="space-y-4 py-4">
-              <div className="flex justify-center pb-4">
-                <div className="border p-4 bg-gray-50 w-full h-48 flex flex-col items-center justify-center">
-                  <div className="text-gray-500 mb-4">
-                    {currentPatient?.gender === "male" ? (
-                      <UserCircle className="h-12 w-12 text-blue-500" />
-                    ) : currentPatient?.gender === "female" ? (
-                      <UserCircle2 className="h-12 w-12 text-pink-500" />
-                    ) : (
-                      <Users className="h-12 w-12 text-purple-500" />
-                    )}
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="font-medium">
-                      染色体核型: {currentPatient?.gender === "male" ? "46,XY" : currentPatient?.gender === "female" ? "46,XX" : "46,XX/XY"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      检测结果: 正常
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      检测日期: 2023-01-15
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="details">
-              <div className="py-4">
-                <p className="text-sm text-muted-foreground">详细染色体分析结果...</p>
-              </div>
-            </TabsContent>
-            <TabsContent value="history">
-              <div className="py-4">
-                <p className="text-sm text-muted-foreground">暂无历史检测记录</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-          <DialogFooter>
-            <Button onClick={() => setGeneticReport(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 处方弹窗 */}
-      <Dialog open={showPrescriptionDialog} onOpenChange={setShowPrescriptionDialog}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>电子处方</DialogTitle>
-            <DialogDescription>
-              患者 {currentPatient?.name} 的电子处方详情
-            </DialogDescription>
-          </DialogHeader>
-          
-          {currentPatient && (
-            <div className="space-y-6">
-              {/* 患者信息 */}
-              <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-md">
-                <div>
-                  <p className="text-sm text-muted-foreground">患者姓名</p>
-                  <p className="font-medium">{currentPatient.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">性别/年龄</p>
-                  <p>
-                    {currentPatient.gender === "male" ? "男" : currentPatient.gender === "female" ? "女" : "其他"} / {currentPatient.age}岁
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">患者ID</p>
-                  <p>{currentPatient.id}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">开方医生</p>
-                  <p>{currentPatient.doctor} ({currentPatient.doctorTitle})</p>
-                </div>
-              </div>
-              
-              {/* 诊断信息 */}
-              <div>
-                <h4 className="font-medium mb-2">诊断结果</h4>
-                <div className="p-3 bg-muted/30 rounded-md">
-                  <p>高血压 (I10) / 2型糖尿病 (E11)</p>
-                </div>
-              </div>
-              
-              {/* 药品列表 */}
-              <div>
-                <h4 className="font-medium mb-2">药品清单</h4>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>药品名称</TableHead>
-                      <TableHead>规格</TableHead>
-                      <TableHead>用法用量</TableHead>
-                      <TableHead>数量</TableHead>
-                      <TableHead className="text-right">状态</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">苯磺酸氨氯地平片</TableCell>
-                      <TableCell>5mg*7片</TableCell>
-                      <TableCell>每日1次，每次1片，口服</TableCell>
-                      <TableCell>4盒</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="bg-green-50 text-green-700">已发药</Badge>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">二甲双胍片</TableCell>
-                      <TableCell>0.5g*10片</TableCell>
-                      <TableCell>每日3次，每次1片，饭后服用</TableCell>
-                      <TableCell>3盒</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="bg-green-50 text-green-700">已发药</Badge>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {/* 处方备注 */}
-              <div>
-                <h4 className="font-medium mb-2">医嘱</h4>
-                <div className="p-3 bg-muted/30 rounded-md">
-                  <p className="text-sm">请患者严格按照用药规定服药，保持低盐低脂饮食，适当运动，每日测量血压并记录。两周后复诊。</p>
-                </div>
-              </div>
-              
-              {/* 处方信息 */}
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>处方编号: RX202309150023</span>
-                <span>开具时间: 2023-09-15 14:30</span>
-              </div>
-            </div>
-          )}
-          
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowPrescriptionDialog(false)}>关闭</Button>
-            <Button variant="outline">
-              <FileDown className="mr-2 h-4 w-4" />
-              打印处方
-            </Button>
-            <Button>
-              <Edit className="mr-2 h-4 w-4" />
-              修改处方
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </MainLayout>
-  );
-};
-
-export default PatientRecords;
+                              <div className="flex items-center gap-
