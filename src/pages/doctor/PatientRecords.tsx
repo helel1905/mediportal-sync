@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,9 +43,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Search,
-  Filter,
   Barcode,
   User,
   Clock,
@@ -58,6 +58,8 @@ import {
   Bell,
   FileDown,
   FilePlus,
+  RotateCcw,
+  Stethoscope,
 } from "lucide-react";
 
 // 模拟数据
@@ -184,6 +186,18 @@ const mockPatients = [
   },
 ];
 
+// 医生列表模拟数据
+const mockDoctors = [
+  { name: "张医生", title: "主任医师", department: "内科/消化内科" },
+  { name: "陈医生", title: "副主任医师", department: "外科/骨科" },
+  { name: "王医生", title: "主治医师", department: "妇产科/产科" },
+  { name: "李医生", title: "主任医师", department: "内科/心血管内科" },
+  { name: "吴医生", title: "副主任医师", department: "耳鼻喉科" },
+  { name: "刘医生", title: "主任医师", department: "外科/神经外科" },
+  { name: "郑医生", title: "主治医师", department: "精神科" },
+  { name: "孙医生", title: "副主任医师", department: "内科/呼吸内科" },
+];
+
 // 格式化相对时间
 const formatRelativeTime = (date: Date) => {
   const now = new Date();
@@ -210,9 +224,21 @@ const isOverdue = (date: Date, status: string) => {
   return diffMins > 30; // 超过30分钟未接诊视为超时
 };
 
+// 根据状态获取排序优先级
+const getStatusPriority = (status: string) => {
+  switch (status) {
+    case "in-treatment": return 1;
+    case "waiting": return 2;
+    case "completed": return 3;
+    default: return 4;
+  }
+};
+
 const PatientRecords = () => {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [doctorFilter, setDoctorFilter] = useState(user?.role === "doctor" ? user.name : "all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState<string>("records");
   const [prescriptionFilter, setPrescriptionFilter] = useState<"all" | "withPrescription" | "withoutPrescription">("all");
@@ -224,27 +250,62 @@ const PatientRecords = () => {
   const { toast } = useToast();
 
   // 搜索和筛选逻辑
-  const filteredPatients = mockPatients.filter((patient) => {
-    const matchesSearch =
-      patient.name.includes(searchTerm) ||
-      patient.id.includes(searchTerm);
+  const filteredPatients = (() => {
+    // 首先按照医生筛选
+    let result = mockPatients.filter(patient => 
+      doctorFilter === "all" || patient.doctor === doctorFilter
+    );
     
-    const matchesDepartment =
-      departmentFilter === "all" || patient.department.includes(departmentFilter);
+    // 应用其他筛选条件
+    result = result.filter((patient) => {
+      const matchesSearch =
+        patient.name.includes(searchTerm) ||
+        patient.id.includes(searchTerm);
+      
+      const matchesDepartment =
+        departmentFilter === "all" || patient.department.includes(departmentFilter);
+      
+      const matchesStatus =
+        statusFilter === "all" || 
+        (statusFilter === "waiting" && patient.status === "waiting") ||
+        (statusFilter === "in-treatment" && patient.status === "in-treatment") ||
+        (statusFilter === "completed" && patient.status === "completed");
+      
+      const matchesPrescription = 
+        prescriptionFilter === "all" || 
+        (prescriptionFilter === "withPrescription" && patient.hasPrescription) ||
+        (prescriptionFilter === "withoutPrescription" && !patient.hasPrescription);
+      
+      return matchesSearch && matchesDepartment && matchesStatus && matchesPrescription;
+    });
+
+    // 按状态排序：诊中 > 候诊 > 完成
+    result.sort((a, b) => {
+      return getStatusPriority(a.status) - getStatusPriority(b.status);
+    });
     
-    const matchesStatus =
-      statusFilter === "all" || 
-      (statusFilter === "waiting" && patient.status === "waiting") ||
-      (statusFilter === "in-treatment" && patient.status === "in-treatment") ||
-      (statusFilter === "completed" && patient.status === "completed");
+    return result;
+  })();
+
+  // 重置筛选条件
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setDepartmentFilter("all");
+    setStatusFilter("all");
+    setPrescriptionFilter("all");
+    // 如果当前用户是医生，重置为当前医生，否则重置为全部
+    if (user?.role === "doctor") {
+      setDoctorFilter(user.name);
+    } else {
+      setDoctorFilter("all");
+    }
     
-    const matchesPrescription = 
-      prescriptionFilter === "all" || 
-      (prescriptionFilter === "withPrescription" && patient.hasPrescription) ||
-      (prescriptionFilter === "withoutPrescription" && !patient.hasPrescription);
-    
-    return matchesSearch && matchesDepartment && matchesStatus && matchesPrescription;
-  });
+    toast({
+      title: "筛选已重置",
+      description: "所有筛选条件已重置为默认值",
+      duration: 3000,
+    });
+  };
 
   // 查看当前叫号患者
   const handleViewCurrentPatient = () => {
@@ -359,7 +420,7 @@ const PatientRecords = () => {
             {/* 筛选和搜索区域 */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
@@ -388,6 +449,21 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
+                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
+                    <SelectTrigger className="flex items-center">
+                      <Stethoscope className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="选择医生" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">所有医生</SelectItem>
+                      {mockDoctors.map((doctor) => (
+                        <SelectItem key={doctor.name} value={doctor.name}>
+                          {doctor.name} ({doctor.title})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="就诊状态" />
@@ -400,13 +476,14 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      高级筛选
-                    </Button>
-                    <Button variant="outline">重置</Button>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={handleResetFilters}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置筛选
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -691,7 +768,7 @@ const PatientRecords = () => {
             {/* 筛选和搜索区域 */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
@@ -720,6 +797,21 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
+                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
+                    <SelectTrigger className="flex items-center">
+                      <Stethoscope className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="选择医生" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">所有医生</SelectItem>
+                      {mockDoctors.map((doctor) => (
+                        <SelectItem key={doctor.name} value={doctor.name}>
+                          {doctor.name} ({doctor.title})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
                   <Select 
                     value={prescriptionFilter} 
                     onValueChange={(value) => setPrescriptionFilter(value as "all" | "withPrescription" | "withoutPrescription")}
@@ -734,13 +826,14 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      高级筛选
-                    </Button>
-                    <Button variant="outline">重置</Button>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={handleResetFilters}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置筛选
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -888,7 +981,7 @@ const PatientRecords = () => {
             <DialogTitle>身份证照片</DialogTitle>
             <DialogDescription>
               {currentPatient?.name} 的身份证照片核对
-            </DialogDescription>
+            </DialogDescription>.
           </DialogHeader>
           <div className="space-y-4">
             <div className="flex justify-center pb-4">
