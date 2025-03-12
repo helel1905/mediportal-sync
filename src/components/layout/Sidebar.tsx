@@ -1,11 +1,9 @@
-
 import React from "react";
 import {
   ChevronLeft,
   LayoutDashboard,
   FileText,
   Brain,
-  Stethoscope,
   Pill,
   Clock,
   ClipboardList,
@@ -29,9 +27,8 @@ export const Sidebar = ({ isOpen, currentRole }: SidebarProps) => {
   const menuItems = {
     doctor: [
       { name: "仪表盘", icon: <LayoutDashboard size={20} />, path: "/" },
-      { name: "病历查询", icon: <FileText size={20} />, path: "/patient-records" },
+      { name: "病历查询/处方", icon: <FileText size={20} />, path: "/patient-records" },
       { name: "AI辅助诊断", icon: <Brain size={20} />, path: "/ai-diagnosis" },
-      { name: "电子处方", icon: <Stethoscope size={20} />, path: "/prescriptions" },
     ],
     pharmacy: [
       { name: "仪表盘", icon: <LayoutDashboard size={20} />, path: "/" },

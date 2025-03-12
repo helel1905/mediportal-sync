@@ -18,7 +18,7 @@ import Index from "./pages/Index";
 // 医生路由页面
 import PatientRecords from "./pages/doctor/PatientRecords";
 import AIDiagnosis from "./pages/doctor/AIDiagnosis";
-import Prescriptions from "./pages/doctor/Prescriptions";
+// import Prescriptions from "./pages/doctor/Prescriptions";
 
 // 药房路由页面
 import Inventory from "./pages/pharmacy/Inventory";
@@ -67,9 +67,10 @@ const App = () => (
                 <AIDiagnosis />
               </ProtectedRoute>
             } />
+            {/* Redirect prescriptions to patient-records */}
             <Route path="/prescriptions" element={
               <ProtectedRoute allowedRoles={["doctor"]}>
-                <Prescriptions />
+                <Navigate to="/patient-records" replace />
               </ProtectedRoute>
             } />
             

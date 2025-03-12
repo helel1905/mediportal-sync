@@ -33,7 +33,10 @@ const PrescriptionReview = () => {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">处方审核</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">处方审核</h1>
+            <p className="text-muted-foreground mt-1">审核医生开具的电子处方并管理药品发放</p>
+          </div>
         </div>
 
         <Tabs defaultValue="pending" onValueChange={handleTabChange}>
