@@ -10,6 +10,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Cell,
 } from "recharts";
 import { calculateTimeTrends, getConsultationStats } from "@/utils/consultationTimeUtils";
 import { Hourglass, Clock } from "lucide-react";
@@ -84,10 +85,14 @@ const ConsultationTimeTrend = () => {
               <Bar 
                 yAxisId="right" 
                 dataKey="efficiency" 
-                fill={(data) => data.efficiencyColor} 
+                fill="#4ade80" 
                 name="效率评分"
                 barSize={20}
-              />
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.efficiencyColor} />
+                ))}
+              </Bar>
               <Bar 
                 yAxisId="left" 
                 dataKey="consultationCount" 
