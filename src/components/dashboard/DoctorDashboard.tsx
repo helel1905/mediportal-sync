@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,8 @@ import {
   ArrowRight, 
   CheckCircle2, 
   AlertCircle, 
-  Bell 
+  Bell,
+  Timer 
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,8 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import ConsultationTimeTrend from "./ConsultationTimeTrend";
+import { getConsultationStats } from "@/utils/consultationTimeUtils";
 
 const patientData = [
   { name: "08:00", value: 4 },
@@ -46,6 +48,8 @@ const patients = [
 ];
 
 const DoctorDashboard = () => {
+  const consultationStats = getConsultationStats();
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,9 +71,9 @@ const DoctorDashboard = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12/20</div>
-            <p className="text-xs text-muted-foreground">已完成 60%</p>
-            <Progress className="mt-2" value={60} />
+            <div className="text-2xl font-bold">{consultationStats.completed}/{consultationStats.total}</div>
+            <p className="text-xs text-muted-foreground">已完成 {consultationStats.completionRate}%</p>
+            <Progress className="mt-2" value={consultationStats.completionRate} />
           </CardContent>
         </Card>
         
@@ -104,7 +108,10 @@ const DoctorDashboard = () => {
         </Card>
       </div>
 
-      {/* Chart and Patients */}
+      {/* Consultation Time Trend (New) */}
+      <ConsultationTimeTrend />
+
+      {/* Patient Flow Trend */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="dashboard-card">
           <CardHeader>
@@ -221,8 +228,8 @@ const DoctorDashboard = () => {
               <span>AI辅助诊断</span>
             </Button>
             <Button className="h-auto flex-col p-6 space-y-2" variant="outline">
-              <Clock className="h-6 w-6" />
-              <span>工作排班</span>
+              <Timer className="h-6 w-6" />
+              <span>接诊时间</span>
             </Button>
           </div>
         </CardContent>
