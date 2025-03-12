@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +44,6 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import {
   Search,
-  Filter,
   Barcode,
   User,
   Clock,
@@ -58,6 +56,8 @@ import {
   Bell,
   FileDown,
   FilePlus,
+  RotateCcw,
+  Stethoscope,
 } from "lucide-react";
 
 // 模拟数据
@@ -184,6 +184,25 @@ const mockPatients = [
   },
 ];
 
+// 当前登录医生的模拟数据
+const currentDoctor = {
+  name: "张医生",
+  title: "主任医师",
+  department: "内科/消化内科",
+};
+
+// 医生列表模拟数据
+const mockDoctors = [
+  { name: "张医生", title: "主任医师", department: "内科/消化内科" },
+  { name: "陈医生", title: "副主任医师", department: "外科/骨科" },
+  { name: "王医生", title: "主治医师", department: "妇产科/产科" },
+  { name: "李医生", title: "主任医师", department: "内科/心血管内科" },
+  { name: "吴医生", title: "副主任医师", department: "耳鼻喉科" },
+  { name: "刘医生", title: "主任医师", department: "外科/神经外科" },
+  { name: "郑医生", title: "主治医师", department: "精神科" },
+  { name: "孙医生", title: "副主任医师", department: "内科/呼吸内科" },
+];
+
 // 格式化相对时间
 const formatRelativeTime = (date: Date) => {
   const now = new Date();
@@ -210,9 +229,20 @@ const isOverdue = (date: Date, status: string) => {
   return diffMins > 30; // 超过30分钟未接诊视为超时
 };
 
+// 根据状态获取排序优先级
+const getStatusPriority = (status: string) => {
+  switch (status) {
+    case "in-treatment": return 1;
+    case "waiting": return 2;
+    case "completed": return 3;
+    default: return 4;
+  }
+};
+
 const PatientRecords = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [doctorFilter, setDoctorFilter] = useState(currentDoctor.name);
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState<string>("records");
   const [prescriptionFilter, setPrescriptionFilter] = useState<"all" | "withPrescription" | "withoutPrescription">("all");
@@ -221,30 +251,61 @@ const PatientRecords = () => {
   const [idCardPreview, setIdCardPreview] = useState(false);
   const [geneticReport, setGeneticReport] = useState(false);
   const [showPrescriptionDialog, setShowPrescriptionDialog] = useState(false);
+  const [showMedicalRecordDialog, setShowMedicalRecordDialog] = useState(false);
+  const [editMedicalRecordDialog, setEditMedicalRecordDialog] = useState(false);
   const { toast } = useToast();
 
-  // 搜索和筛选逻辑
-  const filteredPatients = mockPatients.filter((patient) => {
-    const matchesSearch =
-      patient.name.includes(searchTerm) ||
-      patient.id.includes(searchTerm);
+  // 过滤和排序患者列表
+  const filteredPatients = (() => {
+    // 只显示当前医生的患者
+    let result = mockPatients.filter(patient => 
+      doctorFilter === "all" || patient.doctor === doctorFilter
+    );
     
-    const matchesDepartment =
-      departmentFilter === "all" || patient.department.includes(departmentFilter);
+    // 应用其他筛选条件
+    result = result.filter((patient) => {
+      const matchesSearch =
+        patient.name.includes(searchTerm) ||
+        patient.id.includes(searchTerm);
+      
+      const matchesDepartment =
+        departmentFilter === "all" || patient.department.includes(departmentFilter);
+      
+      const matchesStatus =
+        statusFilter === "all" || 
+        (statusFilter === "waiting" && patient.status === "waiting") ||
+        (statusFilter === "in-treatment" && patient.status === "in-treatment") ||
+        (statusFilter === "completed" && patient.status === "completed");
+      
+      const matchesPrescription = 
+        prescriptionFilter === "all" || 
+        (prescriptionFilter === "withPrescription" && patient.hasPrescription) ||
+        (prescriptionFilter === "withoutPrescription" && !patient.hasPrescription);
+      
+      return matchesSearch && matchesDepartment && matchesStatus && matchesPrescription;
+    });
+
+    // 按状态排序：诊中 > 候诊 > 完成
+    result.sort((a, b) => {
+      return getStatusPriority(a.status) - getStatusPriority(b.status);
+    });
     
-    const matchesStatus =
-      statusFilter === "all" || 
-      (statusFilter === "waiting" && patient.status === "waiting") ||
-      (statusFilter === "in-treatment" && patient.status === "in-treatment") ||
-      (statusFilter === "completed" && patient.status === "completed");
-    
-    const matchesPrescription = 
-      prescriptionFilter === "all" || 
-      (prescriptionFilter === "withPrescription" && patient.hasPrescription) ||
-      (prescriptionFilter === "withoutPrescription" && !patient.hasPrescription);
-    
-    return matchesSearch && matchesDepartment && matchesStatus && matchesPrescription;
-  });
+    return result;
+  })();
+
+  // 重置筛选条件
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setDepartmentFilter("all");
+    setStatusFilter("all");
+    setPrescriptionFilter("all");
+    // 不重置医生筛选，保持当前医生
+    toast({
+      title: "筛选已重置",
+      description: "所有筛选条件已重置为默认值",
+      duration: 3000,
+    });
+  };
 
   // 查看当前叫号患者
   const handleViewCurrentPatient = () => {
@@ -268,17 +329,23 @@ const PatientRecords = () => {
 
   // 改变患者状态
   const handleStatusChange = (patientId: string, newStatus: string) => {
-    toast({
-      title: "状态已更新",
-      description: `患者 ${patientId} 状态已更改为 ${
-        newStatus === "waiting"
-          ? "候诊"
-          : newStatus === "in-treatment"
-          ? "诊中"
-          : "完成"
-      }`,
-      duration: 3000,
-    });
+    // 在实际应用中，这里应该调用API更新状态
+    const patient = mockPatients.find(p => p.id === patientId);
+    if (patient) {
+      patient.status = newStatus as any;
+      
+      toast({
+        title: "状态已更新",
+        description: `患者 ${patient.name} 状态已更改为 ${
+          newStatus === "waiting"
+            ? "候诊"
+            : newStatus === "in-treatment"
+            ? "诊中"
+            : "完成"
+        }`,
+        duration: 3000,
+      });
+    }
   };
 
   // 查看医保信息
@@ -308,6 +375,18 @@ const PatientRecords = () => {
     });
   };
 
+  // 查看病历
+  const handleViewMedicalRecord = (patient: any) => {
+    setCurrentPatient(patient);
+    setShowMedicalRecordDialog(true);
+  };
+
+  // 编辑病历
+  const handleEditMedicalRecord = (patient: any) => {
+    setCurrentPatient(patient);
+    setEditMedicalRecordDialog(true);
+  };
+
   // 查看处方
   const handleViewPrescription = (patient: any) => {
     setCurrentPatient(patient);
@@ -317,11 +396,37 @@ const PatientRecords = () => {
   // 创建新处方
   const handleCreatePrescription = (patient: any) => {
     setCurrentPatient(patient);
+    setShowPrescriptionDialog(true);
+  };
+
+  // 保存处方并完成就诊
+  const handleSavePrescription = () => {
+    if (!currentPatient) return;
+    
+    // 更新处方状态
+    const patient = mockPatients.find(p => p.id === currentPatient.id);
+    if (patient) {
+      patient.hasPrescription = true;
+      patient.status = "completed";
+      
+      toast({
+        title: "处方已保存",
+        description: `已为患者 ${currentPatient.name} 开具处方并完成就诊`,
+        duration: 3000,
+      });
+      
+      setShowPrescriptionDialog(false);
+    }
+  };
+
+  // 保存病历记录
+  const handleSaveMedicalRecord = () => {
     toast({
-      title: "创建新处方",
-      description: `为患者 ${patient.name} 创建新处方`,
+      title: "病历已保存",
+      description: `患者 ${currentPatient?.name} 的病历已更新`,
       duration: 3000,
     });
+    setEditMedicalRecordDialog(false);
   };
 
   return (
@@ -359,7 +464,7 @@ const PatientRecords = () => {
             {/* 筛选和搜索区域 */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
@@ -388,6 +493,21 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
+                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
+                    <SelectTrigger className="flex items-center">
+                      <Stethoscope className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="选择医生" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">所有医生</SelectItem>
+                      {mockDoctors.map((doctor) => (
+                        <SelectItem key={doctor.name} value={doctor.name}>
+                          {doctor.name} ({doctor.title})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="就诊状态" />
@@ -400,13 +520,14 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      高级筛选
-                    </Button>
-                    <Button variant="outline">重置</Button>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={handleResetFilters}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置筛选
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -613,66 +734,44 @@ const PatientRecords = () => {
                             {/* 操作 */}
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Eye className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>查看病历</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Edit className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>编辑病历</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 flex items-center gap-1"
+                                  onClick={() => handleViewMedicalRecord(patient)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  查看
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-8 flex items-center gap-1"
+                                  onClick={() => handleEditMedicalRecord(patient)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  编辑
+                                </Button>
                                 {patient.hasPrescription ? (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          className="h-8 w-8 p-0 text-primary"
-                                          onClick={() => handleViewPrescription(patient)}
-                                        >
-                                          <FileDown className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>查看处方</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 text-primary flex items-center gap-1"
+                                    onClick={() => handleViewPrescription(patient)}
+                                  >
+                                    <FileDown className="h-4 w-4" />
+                                    处方
+                                  </Button>
                                 ) : (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          className="h-8 w-8 p-0 text-blue-500"
-                                          onClick={() => handleCreatePrescription(patient)}
-                                        >
-                                          <FilePlus className="h-4 w-4" />
-                                        </Button>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>开具处方</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <Button 
+                                    variant="default" 
+                                    size="sm" 
+                                    className="h-8 flex items-center gap-1"
+                                    onClick={() => handleCreatePrescription(patient)}
+                                  >
+                                    <FilePlus className="h-4 w-4" />
+                                    开方
+                                  </Button>
                                 )}
                               </div>
                             </TableCell>
@@ -691,7 +790,7 @@ const PatientRecords = () => {
             {/* 筛选和搜索区域 */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-4 lg:grid-cols-5">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
@@ -720,6 +819,21 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
+                  <Select value={doctorFilter} onValueChange={setDoctorFilter}>
+                    <SelectTrigger className="flex items-center">
+                      <Stethoscope className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="选择医生" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">所有医生</SelectItem>
+                      {mockDoctors.map((doctor) => (
+                        <SelectItem key={doctor.name} value={doctor.name}>
+                          {doctor.name} ({doctor.title})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
                   <Select 
                     value={prescriptionFilter} 
                     onValueChange={(value) => setPrescriptionFilter(value as "all" | "withPrescription" | "withoutPrescription")}
@@ -734,13 +848,14 @@ const PatientRecords = () => {
                     </SelectContent>
                   </Select>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      高级筛选
-                    </Button>
-                    <Button variant="outline">重置</Button>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={handleResetFilters}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    重置筛选
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -797,297 +912,4 @@ const PatientRecords = () => {
                                 </Badge>
                               )}
                             </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {patient.hasPrescription ? (
-                                  <>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="h-8"
-                                      onClick={() => handleViewPrescription(patient)}
-                                    >
-                                      查看处方
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="sm" 
-                                      className="h-8"
-                                    >
-                                      修改
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <Button 
-                                    variant="default" 
-                                    size="sm" 
-                                    className="h-8"
-                                    onClick={() => handleCreatePrescription(patient)}
-                                  >
-                                    开具处方
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* 医保信息弹窗 */}
-      <Dialog open={showingMedicalInsurance} onOpenChange={setShowingMedicalInsurance}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>医保信息</DialogTitle>
-            <DialogDescription>
-              患者 {currentPatient?.name} 的医保详情
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex justify-center pb-4">
-              <div className="border p-4 bg-gray-50 w-48 h-32 flex items-center justify-center">
-                <Barcode className="h-16 w-16 text-primary" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">医保卡号:</span>
-                <span className="text-sm">MI{currentPatient?.id.substring(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">医保类型:</span>
-                <span className="text-sm">城镇职工医保</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">参保年限:</span>
-                <span className="text-sm">8年</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">报销比例:</span>
-                <span className="text-sm">75%</span>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowingMedicalInsurance(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 身份证照片弹窗 */}
-      <Dialog open={idCardPreview} onOpenChange={setIdCardPreview}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>身份证照片</DialogTitle>
-            <DialogDescription>
-              {currentPatient?.name} 的身份证照片核对
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex justify-center pb-4">
-              <div className="border p-4 bg-gray-50 w-64 h-40 flex items-center justify-center">
-                <User className="h-24 w-24 text-gray-300" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">姓名:</span>
-                <span className="text-sm">{currentPatient?.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">身份证号:</span>
-                <span className="text-sm">3****************X</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">出生日期:</span>
-                <span className="text-sm">{currentPatient?.birthDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm font-medium">住址:</span>
-                <span className="text-sm">上海市浦东新区</span>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setIdCardPreview(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 基因报告弹窗 */}
-      <Dialog open={geneticReport} onOpenChange={setGeneticReport}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>染色体检测报告</DialogTitle>
-            <DialogDescription>
-              {currentPatient?.name} 的基因检测结果
-            </DialogDescription>
-          </DialogHeader>
-          <Tabs defaultValue="summary">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="summary">报告摘要</TabsTrigger>
-              <TabsTrigger value="details">详细结果</TabsTrigger>
-              <TabsTrigger value="history">检测历史</TabsTrigger>
-            </TabsList>
-            <TabsContent value="summary" className="space-y-4 py-4">
-              <div className="flex justify-center pb-4">
-                <div className="border p-4 bg-gray-50 w-full h-48 flex flex-col items-center justify-center">
-                  <div className="text-gray-500 mb-4">
-                    {currentPatient?.gender === "male" ? (
-                      <UserCircle className="h-12 w-12 text-blue-500" />
-                    ) : currentPatient?.gender === "female" ? (
-                      <UserCircle2 className="h-12 w-12 text-pink-500" />
-                    ) : (
-                      <Users className="h-12 w-12 text-purple-500" />
-                    )}
-                  </div>
-                  <div className="text-center space-y-2">
-                    <p className="font-medium">
-                      染色体核型: {currentPatient?.gender === "male" ? "46,XY" : currentPatient?.gender === "female" ? "46,XX" : "46,XX/XY"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      检测结果: 正常
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      检测日期: 2023-01-15
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="details">
-              <div className="py-4">
-                <p className="text-sm text-muted-foreground">详细染色体分析结果...</p>
-              </div>
-            </TabsContent>
-            <TabsContent value="history">
-              <div className="py-4">
-                <p className="text-sm text-muted-foreground">暂无历史检测记录</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-          <DialogFooter>
-            <Button onClick={() => setGeneticReport(false)}>关闭</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* 处方弹窗 */}
-      <Dialog open={showPrescriptionDialog} onOpenChange={setShowPrescriptionDialog}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>电子处方</DialogTitle>
-            <DialogDescription>
-              患者 {currentPatient?.name} 的电子处方详情
-            </DialogDescription>
-          </DialogHeader>
-          
-          {currentPatient && (
-            <div className="space-y-6">
-              {/* 患者信息 */}
-              <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-md">
-                <div>
-                  <p className="text-sm text-muted-foreground">患者姓名</p>
-                  <p className="font-medium">{currentPatient.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">性别/年龄</p>
-                  <p>
-                    {currentPatient.gender === "male" ? "男" : currentPatient.gender === "female" ? "女" : "其他"} / {currentPatient.age}岁
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">患者ID</p>
-                  <p>{currentPatient.id}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">开方医生</p>
-                  <p>{currentPatient.doctor} ({currentPatient.doctorTitle})</p>
-                </div>
-              </div>
-              
-              {/* 诊断信息 */}
-              <div>
-                <h4 className="font-medium mb-2">诊断结果</h4>
-                <div className="p-3 bg-muted/30 rounded-md">
-                  <p>高血压 (I10) / 2型糖尿病 (E11)</p>
-                </div>
-              </div>
-              
-              {/* 药品列表 */}
-              <div>
-                <h4 className="font-medium mb-2">药品清单</h4>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>药品名称</TableHead>
-                      <TableHead>规格</TableHead>
-                      <TableHead>用法用量</TableHead>
-                      <TableHead>数量</TableHead>
-                      <TableHead className="text-right">状态</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">苯磺酸氨氯地平片</TableCell>
-                      <TableCell>5mg*7片</TableCell>
-                      <TableCell>每日1次，每次1片，口服</TableCell>
-                      <TableCell>4盒</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="bg-green-50 text-green-700">已发药</Badge>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">二甲双胍片</TableCell>
-                      <TableCell>0.5g*10片</TableCell>
-                      <TableCell>每日3次，每次1片，饭后服用</TableCell>
-                      <TableCell>3盒</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="bg-green-50 text-green-700">已发药</Badge>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {/* 处方备注 */}
-              <div>
-                <h4 className="font-medium mb-2">医嘱</h4>
-                <div className="p-3 bg-muted/30 rounded-md">
-                  <p className="text-sm">请患者严格按照用药规定服药，保持低盐低脂饮食，适当运动，每日测量血压并记录。两周后复诊。</p>
-                </div>
-              </div>
-              
-              {/* 处方信息 */}
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>处方编号: RX202309150023</span>
-                <span>开具时间: 2023-09-15 14:30</span>
-              </div>
-            </div>
-          )}
-          
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowPrescriptionDialog(false)}>关闭</Button>
-            <Button variant="outline">
-              <FileDown className="mr-2 h-4 w-4" />
-              打印处方
-            </Button>
-            <Button>
-              <Edit className="mr-2 h-4 w-4" />
-              修改处方
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </MainLayout>
-  );
-};
-
-export default PatientRecords;
+                            <TableCell className="
