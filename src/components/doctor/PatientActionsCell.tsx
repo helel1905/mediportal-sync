@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, FileDown, FilePlus } from "lucide-react";
+import MedicalRecordDialog from "./MedicalRecordDialog";
 
 interface PatientActionsCellProps {
   hasPrescription: boolean;
@@ -17,6 +18,9 @@ const PatientActionsCell: React.FC<PatientActionsCellProps> = ({
   onCreatePrescription,
   patient,
 }) => {
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showEditSheet, setShowEditSheet] = useState(false);
+
   return (
     <TableCell className="text-right">
       <div className="flex items-center justify-end gap-2">
@@ -24,6 +28,7 @@ const PatientActionsCell: React.FC<PatientActionsCellProps> = ({
           variant="ghost" 
           size="sm" 
           className="h-8 flex items-center gap-1"
+          onClick={() => setShowViewDialog(true)}
         >
           <Eye className="h-4 w-4" />
           查看
@@ -32,6 +37,7 @@ const PatientActionsCell: React.FC<PatientActionsCellProps> = ({
           variant="ghost" 
           size="sm" 
           className="h-8 flex items-center gap-1"
+          onClick={() => setShowEditSheet(true)}
         >
           <Edit className="h-4 w-4" />
           编辑
@@ -57,6 +63,15 @@ const PatientActionsCell: React.FC<PatientActionsCellProps> = ({
             开方
           </Button>
         )}
+
+        {/* 医疗记录查看和编辑组件 */}
+        <MedicalRecordDialog 
+          patient={patient}
+          showViewDialog={showViewDialog}
+          setShowViewDialog={setShowViewDialog}
+          showEditSheet={showEditSheet}
+          setShowEditSheet={setShowEditSheet}
+        />
       </div>
     </TableCell>
   );
