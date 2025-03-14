@@ -60,3 +60,62 @@ export interface AuditLog {
   timestamp: string;
   details: string;
 }
+
+// System metrics interfaces
+export interface SystemMetric {
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  status: "normal" | "warning" | "critical";
+  timestamp: string;
+}
+
+export interface ServerStatus {
+  id: string;
+  name: string;
+  status: "online" | "offline" | "maintenance";
+  uptime: string;
+  lastRestart: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+}
+
+export interface DatabaseMetric {
+  id: string;
+  name: string;
+  connections: number;
+  queriesPerSecond: number;
+  slowQueries: number;
+  cacheHitRatio: number;
+  status: "normal" | "warning" | "critical";
+}
+
+export interface PerformanceMetric {
+  timestamp: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  activeUsers: number;
+  responseTime: number;
+}
+
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  level: "info" | "warning" | "error" | "critical";
+  source: string;
+  message: string;
+  details?: string;
+}
+
+export interface AlertConfig {
+  id: string;
+  metricName: string;
+  condition: ">" | "<" | "=" | ">=" | "<=";
+  threshold: number;
+  notifyEmail: boolean;
+  notifySystem: boolean;
+  severity: "low" | "medium" | "high";
+  enabled: boolean;
+}
