@@ -103,3 +103,46 @@ export interface InsuranceSettlementStats {
   totalAmount: number;
   insuranceAmount: number;
 }
+
+// Financial Reports types
+export type ReportType = 
+  | "daily" 
+  | "weekly" 
+  | "monthly" 
+  | "quarterly" 
+  | "yearly" 
+  | "custom";
+
+export type ReportFormat = "excel" | "pdf" | "csv";
+
+export interface ReportConfig {
+  name: string;
+  description?: string;
+  type: ReportType;
+  startDate?: Date;
+  endDate?: Date;
+  departments: string[];
+  includeCharts: boolean;
+  includeTrends: boolean;
+  format: ReportFormat;
+}
+
+export interface ReportMetric {
+  title: string;
+  current: number;
+  target: number;
+  percentage: number;
+  trend: "up" | "down" | "neutral";
+  trendValue: string;
+}
+
+export interface FinancialTransaction {
+  id: string;
+  date: string;
+  patientId: string;
+  patientName: string;
+  department: string;
+  amount: number;
+  paymentMethod: string;
+  category: string;
+}
