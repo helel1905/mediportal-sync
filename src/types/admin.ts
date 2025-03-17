@@ -119,3 +119,70 @@ export interface AlertConfig {
   severity: "low" | "medium" | "high";
   enabled: boolean;
 }
+
+// Backup related interfaces
+export type BackupType = "full" | "incremental" | "differential";
+export type BackupStatus = "scheduled" | "in_progress" | "completed" | "failed" | "restoring";
+export type BackupStorageType = "local" | "cloud" | "external";
+
+export interface BackupSchedule {
+  id: string;
+  name: string;
+  frequency: "daily" | "weekly" | "monthly" | "custom";
+  time: string; // Time of day for the backup
+  day?: number; // Day of week/month for weekly/monthly backups
+  retentionPeriod: number; // Number of days to keep backups
+  type: BackupType;
+  isActive: boolean;
+  lastRun?: string;
+  nextRun: string;
+}
+
+export interface BackupItem {
+  id: string;
+  name: string;
+  createdAt: string;
+  completedAt?: string;
+  size: string;
+  type: BackupType;
+  status: BackupStatus;
+  scheduleId?: string;
+  scheduleName?: string;
+  storage: BackupStorageType;
+  location: string;
+  createdBy: string;
+  description?: string;
+  compressionRatio?: string;
+  encryptionEnabled: boolean;
+  modules: string[]; // Which modules are backed up
+  isLocked: boolean; // Whether the backup is locked for deletion
+}
+
+export interface RestoreSession {
+  id: string;
+  backupId: string;
+  backupName: string;
+  startTime: string;
+  endTime?: string;
+  status: "in_progress" | "completed" | "failed";
+  progress: number;
+  initiatedBy: string;
+  targetEnvironment: string;
+  errorMessage?: string;
+  modules: string[]; // Which modules are being restored
+}
+
+export interface BackupStorageConfig {
+  id: string;
+  name: string;
+  type: BackupStorageType;
+  path?: string;
+  isDefault: boolean;
+  credentials?: {
+    provider?: "aws" | "azure" | "google";
+    region?: string;
+    bucket?: string;
+  };
+  maxSize?: string;
+  usedSize?: string;
+}
