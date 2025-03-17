@@ -46,3 +46,60 @@ export interface AccountingSummary {
   exceptions: number;
   insurancePending: number;
 }
+
+// Insurance settlement types
+export type InsuranceSettlementStatus = 
+  | "pending" 
+  | "processing"
+  | "approved"
+  | "rejected"
+  | "completed";
+
+export interface InsuranceSettlementItem {
+  id: string;
+  name: string;
+  category: string;
+  specification: string;
+  unitPrice: number;
+  quantity: number;
+  unit: string;
+  insuranceCategory: "甲类" | "乙类" | "丙类" | null;
+  insuranceRatio: number;
+  insurancePayment: number;
+  selfPayment: number;
+}
+
+export interface InsuranceSettlement {
+  id: string;
+  patientId: string;
+  patientName: string;
+  insuranceNumber: string; 
+  insuranceType: string;
+  medicalRecordNumber: string;
+  visitDate: string;
+  department: string;
+  doctor: string;
+  diagnosis: string;
+  totalAmount: number;
+  insurancePayment: number;
+  selfPayment: number;
+  status: InsuranceSettlementStatus;
+  submittedAt: string | null;
+  processedAt: string | null;
+  completedAt: string | null;
+  operator: string;
+  remarks: string;
+  items: InsuranceSettlementItem[];
+  rejectionReason?: string;
+}
+
+export interface InsuranceSettlementStats {
+  total: number;
+  pending: number;
+  processing: number;
+  approved: number;
+  rejected: number;
+  completed: number;
+  totalAmount: number;
+  insuranceAmount: number;
+}
