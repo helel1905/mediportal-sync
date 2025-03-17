@@ -74,7 +74,7 @@ const InsuranceSubmitDialog: React.FC<InsuranceSubmitDialogProps> = ({
             </p>
           </div>
 
-          <Alert variant="warning">
+          <Alert className="bg-amber-50 border-amber-200 text-amber-800">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               提交后将无法修改结算信息，请确认无误后再提交。
