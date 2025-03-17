@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/finance/reports/DatePicker";
-import { DownloadCloud, FileText, FileSpreadsheet, FilePdf } from "lucide-react";
+import { DownloadCloud, FileText, FileSpreadsheet, File } from "lucide-react";
 import { ReportPreviewDialog } from "@/components/finance/reports/ReportPreviewDialog";
 
 export const ReportGeneratorPanel: React.FC = () => {
@@ -54,7 +53,7 @@ export const ReportGeneratorPanel: React.FC = () => {
   const getExportFormatIcon = () => {
     switch (exportFormat) {
       case "excel": return <FileSpreadsheet className="h-4 w-4" />;
-      case "pdf": return <FilePdf className="h-4 w-4" />;
+      case "pdf": return <File className="h-4 w-4" />;
       default: return <FileText className="h-4 w-4" />;
     }
   };
